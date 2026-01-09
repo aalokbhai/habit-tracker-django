@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Habit - Habit Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .edit-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .back-btn {
+            text-decoration: none;
+            color: #0d6efd;
+            font-weight: 500;
+        }
+        .back-btn:hover {
+            color: #0a58ca;
+        }
+        .form-title {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .form-control {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .form-control:focus {
+            border-color: #0d9488;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+        }
+        .btn-save {
+            background: #0d9488;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-save:hover {
+            background: #0b8378;
+            transform: translateY(-2px);
+        }
+        .btn-cancel {
+            background: #f8f9fa;
+            color: #666;
+            padding: 12px 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-cancel:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="edit-container">
+            <a href="{% url 'home' %}" class="back-btn mb-3 d-inline-block">
+                <i class="fa fa-arrow-left me-2"></i>Back to Habit Tracker
+            </a>
+            
+            <h2 class="form-title">Edit Habit</h2>
+            
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <label for="habitName" class="form-label fw-semibold mb-2">Habit Name</label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="edit_task" 
+                           name="edit_task" 
+                           value="{{ task5.task_name }}" 
+                           required 
+                           autofocus>
+                    <div class="form-text mt-2">
+                        Make your habit name specific and actionable. Example: "Read 20 pages" instead of "Read more".
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-semibold mb-2">Current Status</label>
+                    <div class="alert alert-info">
+                        <div class="d-flex justify-content-between">
+                            <span>Created on:</span>
+                            <strong>{{ task5.created_at|date:"M d, Y" }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <span>Total tracked days:</span>
+                            <strong>{{ task5.taskprogress_set.count }}</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-3">
+                    <button type="submit" class="btn btn-save flex-grow-1">
+                        <i class="fa fa-save me-2"></i>Save Changes
+                    </button>
+                    <a href="{% url 'home' %}" class="btn btn-cancel">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+            
+            <div class="mt-5 pt-4 border-top">
+                <h5 class="text-danger mb-3">Danger Zone</h5>
+                <p class="text-muted small mb-3">
+                    Once you delete a habit, all its tracking data will be permanently removed. This action cannot be undone.
+                </p>
+                <a href="{% url 'mark_delete' task5.id %}" 
+                   class="btn btn-outline-danger" 
+                   onclick="return confirm('Are you sure you want to delete this habit? All tracking data will be lost.')">
+                    <i class="fa fa-trash me-2"></i>Delete This Habit
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-focus on input
+        document.getElementById('edit_task').focus();
+        
+        // Confirm before leaving page if changes made
+        let originalValue = "{{ task5.task_name }}";
+        let currentValue = document.getElementById('edit_task').value;
+        
+        window.addEventListener('beforeunload', function (e) {
+            if (document.getElementById('edit_task').value !== originalValue) {
+                e.preventDefault();
+                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+            }
+        });
+    </script>
+</body>
+</html>
