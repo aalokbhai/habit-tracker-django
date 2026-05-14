@@ -28,6 +28,7 @@ def custom_logout(request):
 
 
 
+@login_required
 def home(request):
     """Main app page (requires login)"""
     today = localdate()
@@ -37,52 +38,48 @@ def home(request):
     last_week_start = current_week_start - timedelta(days=7)
     
     # Get only current user's tasks
-    tasks = task.objects.filter(user=request.user).order_by('-created_at')
+    tasks = list(task.objects.filter(user=request.user).order_by('-created_at'))
+    task_ids = [t.id for t in tasks]
+    total_tasks = len(task_ids)
     
-    # Prepare last 7 days
-    last_7_days = []
-    for i in range(6, -1, -1):
-        day = today - timedelta(days=i)
-        last_7_days.append(day)
-    
-    # Calculate days for current and last week
+    # Prepare dates
+    last_7_days = [today - timedelta(days=i) for i in range(6, -1, -1)]
     current_week_days = [current_week_start + timedelta(days=i) for i in range(7)]
     last_week_days = [last_week_start + timedelta(days=i) for i in range(7)]
     
-    # Prepare data for each task
-    total_tasks = tasks.count()
+    # Collect all unique dates we need to query
+    all_dates = set(last_7_days + current_week_days + last_week_days)
+    
+    # Fetch all relevant TaskProgress records in a single query!
+    progress_records = TaskProgress.objects.filter(
+        task_id__in=task_ids,
+        date__in=all_dates
+    )
+    
+    # Create an optimized lookup dictionary: (task_id, date) -> is_completed
+    progress_lookup = {(p.task_id, p.date): p.is_completed for p in progress_records}
+    
     current_week_completions = [0] * 7
     last_week_completions = [0] * 7
     
     for t in tasks:
-        t.completed_today = False
+        t.completed_today = progress_lookup.get((t.id, today), False)
         t.day_status = {}
         
         # Check completion for last 7 days
         for day in last_7_days:
-            progress = TaskProgress.objects.filter(task=t, date=day).first()
-            is_completed = progress.is_completed if progress else False
-            t.day_status[day] = is_completed
-            
-            if day == today:
-                t.completed_today = is_completed
+            t.day_status[day] = progress_lookup.get((t.id, day), False)
         
         # Check completion for current week
         for i, day in enumerate(current_week_days):
-            progress = TaskProgress.objects.filter(task=t, date=day).first()
-            is_completed = progress.is_completed if progress else False
-            
-            if is_completed:
+            if progress_lookup.get((t.id, day), False):
                 current_week_completions[i] += 1
         
         # Check completion for last week
         for i, day in enumerate(last_week_days):
-            progress = TaskProgress.objects.filter(task=t, date=day).first()
-            is_completed = progress.is_completed if progress else False
-            
-            if is_completed:
+            if progress_lookup.get((t.id, day), False):
                 last_week_completions[i] += 1
-    
+                
     # Calculate percentages
     current_week_percentages = []
     last_week_percentages = []
@@ -95,12 +92,12 @@ def home(request):
             last_percent = (last_week_completions[i] / total_tasks) * 100
             last_week_percentages.append(round(last_percent))
     else:
-        current_week_percentages = [0, 0, 0, 0, 0, 0, 0]
-        last_week_percentages = [0, 0, 0, 0, 0, 0, 0]
+        current_week_percentages = [0] * 7
+        last_week_percentages = [0] * 7
     
     # Calculate overall stats
     if total_tasks > 0:
-        today_completed = sum(1 for t in tasks if t.completed_today)
+        today_completed = sum(1 for t in tasks if getattr(t, 'completed_today', False))
         today_percentage = (today_completed / total_tasks) * 100
         
         current_week_avg = sum(current_week_percentages) / 7

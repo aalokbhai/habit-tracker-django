@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         :root {
             --primary: #0d9488;
@@ -751,7 +752,7 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <div class="hero-text">
+            <div class="hero-text" data-aos="fade-right" data-aos-duration="1000">
                 <h1>Build Better Habits, One Day at a Time</h1>
                 <p>Track your daily habits, visualize your progress, and achieve your goals with our intelligent habit tracking system.</p>
                 
@@ -772,7 +773,7 @@
                 </div>
             </div>
             
-            <div class="hero-image">
+            <div class="hero-image" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
                 <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Habit Tracker Dashboard">
             </div>
         </div>
@@ -780,27 +781,27 @@
 
     <!-- About Content Section -->
     <section class="about-content">
-        <div class="section-title">
+        <div class="section-title" data-aos="fade-up">
             <h2>Why Choose Habit Tracker?</h2>
             <p>Discover the benefits of using our intelligent habit tracking system</p>
         </div>
         
         <div class="content-grid">
-            <div class="content-card">
+            <div class="content-card" data-aos="fade-up" data-aos-delay="100">
                 <div class="content-icon">
                     <i class="fas fa-chart-line"></i>
                 </div>
                 <h3>Track Progress</h3>
                 <p>Monitor your habit completion with detailed analytics and visual charts to stay motivated and on track.</p>
             </div>
-            <div class="content-card">
+            <div class="content-card" data-aos="fade-up" data-aos-delay="200">
                 <div class="content-icon">
                     <i class="fas fa-calendar-check"></i>
                 </div>
                 <h3>Daily Tracking</h3>
                 <p>Simple one-click interface to track your habits every day with ease and build consistency over time.</p>
             </div>
-            <div class="content-card">
+            <div class="content-card" data-aos="fade-up" data-aos-delay="300">
                 <div class="content-icon">
                     <i class="fas fa-trophy"></i>
                 </div>
@@ -812,13 +813,13 @@
 
     <!-- Features Section -->
     <section id="features" class="features">
-        <div class="section-title">
+        <div class="section-title" data-aos="fade-up">
             <h2>Powerful Features</h2>
             <p>Everything you need to build and maintain positive habits</p>
         </div>
         
         <div class="features-grid">
-            <div class="feature-card">
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
                 <div class="feature-image">
                     <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Analytics Dashboard">
                 </div>
@@ -826,7 +827,7 @@
                 <p>Get detailed insights into your weekly performance with beautiful charts and progress indicators.</p>
             </div>
             
-            <div class="feature-card">
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
                 <div class="feature-image">
                     <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Daily Tracking">
                 </div>
@@ -834,9 +835,9 @@
                 <p>Mark your habits as completed each day with a simple click. Visualize your consistency.</p>
             </div>
             
-            <div class="feature-card">
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
                 <div class="feature-image">
-                    <img src="https://images.unsplash.com/photo-1550599093-1d1f5b8f12d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Progress Comparison">
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Progress Comparison">
                 </div>
                 <h3>Progress Comparison</h3>
                 <p>Compare your current week with last week to see your improvement and stay motivated.</p>
@@ -846,7 +847,7 @@
 
     <!-- Auth Section -->
     {% if not user.is_authenticated %}
-    <section class="auth-section">
+    <section class="auth-section" data-aos="zoom-in">
         <div class="auth-container">
             <h2>Ready to Transform Your Habits?</h2>
             <p>Join thousands of users who have successfully built lasting habits with our tracker. It's free to get started!</p>
@@ -994,28 +995,15 @@
                 });
             });
 
-            // Animate cards on scroll
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver(function(entries) {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }
-                });
-            }, observerOptions);
-
-            // Observe content cards
-            document.querySelectorAll('.content-card, .feature-card').forEach(card => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'all 0.5s ease';
-                observer.observe(card);
-            });
+            // Removed custom observer as we are using AOS
+        });
+    </script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
         });
     </script>
 </body>
